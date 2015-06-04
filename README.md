@@ -1,4 +1,3 @@
-# Data and Script Repository: teeth-and-claws
 ### Data repository for the doctoral thesis of Albin Blaschka
 "With teeth and claws: Managing and restoring ecosystem services of an alpine cultural landscape"
 (Original german title: "Mit Zähnen und Klauen: Erhalt und Wiederherstellung von Ökosystemleistungen einer alpinen
