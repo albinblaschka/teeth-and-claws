@@ -19,5 +19,6 @@ Here on GitHub the original data and accompanying R-Scripts are available.
 #### Analysis of cover in different functional groups
 Script: analysis_functionalgroups.R; data: data_functionalgroups_development.csv
 
-The development of three functional groups (dwarf shrubs, herbs and open soil) is analysed with a GLM, for details see the comments 
-in the script.
+To study the changes in vegetation and restoration of pastures already infested with shrubs by targeted pasturing, a trial
+following a factorial design was set up, with four replicates. The development of three functional groups (dwarf shrubs,
+herbs and open soil) is analysed with a GLM, for details see the comments in the script.
