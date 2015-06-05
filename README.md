@@ -17,7 +17,8 @@ Here on GitHub the original data and accompanying R-Scripts are available.
 ### The scripts
 
 #### Analysis of cover in different functional groups
-Script: analysis_functionalgroups.R; data: data_functionalgroups_development.csv
+Script: [analysis_functionalgroups.R](https://github.com/albinblaschka/teeth-and-claws/blob/master/analysis_functionalgroups.R);
+data: [data_functionalgroups_development.csv](https://github.com/albinblaschka/teeth-and-claws/blob/master/data_functionalgroups_development.csv)
 
 To study the changes in vegetation and restoration of pastures already infested with shrubs by targeted pasturing, a trial
 following a factorial design was set up, with four replicates. The development of three functional groups (dwarf shrubs,
