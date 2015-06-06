@@ -27,6 +27,8 @@ following a factorial design was set up, with four replicates. The development o
 herbs and open soil) is analysed with a GLM, for details see the comments in the script.
 
 **Columns:**
+
+```
 variant: Factor, 4 levels "A","B","C","D"
       A: Null variant, no impact
       B: First mown, followed by targeted pasturing
@@ -36,3 +38,4 @@ year: int - denotes the duration of the trial (4 years); variant D was started o
 replicate: int - four replicates were used for all variants
 functionaltype: Factor, 3 levels - "open soil","dwarf shrubs", "herbs"
 frequency: cover of the functional types, measured with a quadrat (1m², divided by 10cm by 10cm): Dependent variable
+```
