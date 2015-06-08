@@ -26,9 +26,8 @@ To study the changes in vegetation and restoration of pastures already infested 
 following a factorial design was set up, with four replicates. The development of three functional groups (dwarf shrubs,
 herbs and open soil) is analysed with a GLM, for details see the comments in the script.
 
-**Columns:**
-
 ```
+**Columns:**
 variant: Factor, 4 levels "A","B","C","D"
       A: Null variant, no impact
       B: First mown, followed by targeted pasturing
