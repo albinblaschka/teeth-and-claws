@@ -75,19 +75,34 @@ glmR2 <- function(glmSum) {
     r2 <- round(r2, digits = 0)
 }
 
+ci.lines <- function(model, predfor, lcol) {
+    
+    zhat <- predict(model, se.fit = TRUE)       # result on logit or log scale
+    zupper <- zhat$fit + 1.96 * zhat$se.fit
+    zlower <- zhat$fit - 1.96 * zhat$se.fit
+    
+    yupper <- unique(exp(zupper))                   # for log link
+    ylower <- unique(exp(zlower))
+    
+    lines(predfor[order(predfor)], yupper[order(predfor)], lty = 2, col = lcol)
+    lines(predfor[order(predfor)], ylower[order(predfor)], lty = 2, col = lcol)
+    
+}
+
+
 # Plotting the Model
-plotGLM <- function(soil, shrubs, herbs, coef.soil, coef.shrubs, coef.herbs, period, cap) {
-    plot(frequency ~ year, soil, pch=20, col = 'brown', xlab = "Year",
+plotGLM <- function(model.soil,model.shrubs, model.herbs, period, cap) {
+    plot(frequency ~ year, as.data.frame(model.soil$model), pch=20, col = 'brown', xlab = "Year",
          ylab = "Frequency [%]", ylim = c(0,100), main="", sub = cap,
          xaxt="n",yaxt="n")
-    points(frequency ~ year, shrubs, pch=18, col = 'darkgreen') 
-    points(frequency ~ year, herbs, pch=17, col = 'blue')
+    points(frequency ~ year, as.data.frame(model.shrubs$model), pch=18, col = 'darkgreen') 
+    points(frequency ~ year, as.data.frame(model.herbs$model), pch=17, col = 'blue')
     endpos <- length(period)-1
     axis(1, at=0:endpos, labels=period)
     axis(2, at=seq(from=0,to=100,by=10), labels=seq(from=0,to=100,by=10))
-    curve(exp(coef.soil[1]) * exp(coef.soil[2] * x), add = TRUE, col = "brown")
-    curve(exp(coef.shrubs[1]) * exp(coef.shrubs[2] * x), add = TRUE, col = "darkgreen")
-    curve(exp(coef.herbs[1]) * exp(coef.herbs[2] * x), add = TRUE, col = "blue")
+    curve(exp(coef(model.soil)[1]) * exp(coef(model.soil)[2] * x), add = TRUE, col = "brown")
+    curve(exp(coef(model.shrubs)[1]) * exp(coef(model.shrubs)[2] * x), add = TRUE, col = "darkgreen")
+    curve(exp(coef(model.herbs)[1]) * exp(coef(model.herbs)[2] * x), add = TRUE, col = "blue")
 }
 
 
@@ -136,65 +151,53 @@ freq.D.herbs <- subset(freq.D, functionaltype == 'herbs')
 # Variant A, Null ----
 # Variant A, open soil
 GLM.A.soil <- glm(frequency ~ year, family = poisson, data = freq.A.soil)
-coef.A.soil <- coef(GLM.A.soil)
 pseudoR2.A.soil <- glmR2(GLM.A.soil)
 
 # Variant A, dwarf shrubs
 GLM.A.shrubs <- glm(frequency ~ year, family = poisson, data = freq.A.shrubs)
-coef.A.shrubs <- coef(GLM.A.shrubs)
 pseudoR2.A.shrubs <- glmR2(GLM.A.shrubs)
 
 # Variant A, herbs 
 GLM.A.herbs <- glm(frequency ~ year, family = poisson, data = freq.A.herbs)
-coef.A.herbs <- coef(GLM.A.herbs)
 pseudoR2.A.herbs <- glmR2(GLM.A.herbs)
 
 # Variant B, Mown, targeted pasturing ----
 # Variant B, open soil
 GLM.B.soil <- glm(frequency ~ year, family = poisson, data = freq.B.soil)
-coef.B.soil <- coef(GLM.B.soil)
 pseudoR2.B.soil <- glmR2(GLM.B.soil)
 
 # Variant B, dwarf shrubs
 GLM.B.shrubs <- glm(frequency ~ year, family = poisson, data = freq.B.shrubs)
-coef.B.shrubs <- coef(GLM.B.shrubs)
 pseudoR2.B.shrubs <- glmR2(GLM.B.shrubs)
 
 # Variant B, herbs 
 GLM.B.herbs <- glm(frequency ~ year, family = poisson, data = freq.B.herbs)
-coef.B.herbs <- coef(GLM.B.herbs)
 pseudoR2.B.herbs <- glmR2(GLM.B.herbs)
 
 # Variant C, targeted pasturing ----
 # Variant C, open soil
 GLM.C.soil <- glm(frequency ~ year, family = poisson, data = freq.C.soil)
-coef.C.soil <- coef(GLM.C.soil)
 pseudoR2.C.soil <- glmR2(GLM.C.soil)
 
 # Variant C, dwarf shrubs
 GLM.C.shrubs <- glm(frequency ~ year, family = poisson, data = freq.C.shrubs)
-coef.C.shrubs <- coef(GLM.C.shrubs)
 pseudoR2.C.shrubs <- glmR2(GLM.C.shrubs)
 
 # Variant C, herbs 
 GLM.C.herbs <- glm(frequency ~ year, family = poisson, data = freq.C.herbs)
-coef.C.herbs <- coef(GLM.C.herbs)
 pseudoR2.C.herbs <- glmR2(GLM.C.herbs)
 
 # Variant D, browsing, extensive pasturing ----
 # Variant D, open soil
 GLM.D.soil <- glm(frequency ~ year, family = poisson, data = freq.D.soil)
-coef.D.soil <- coef(GLM.D.soil)
 pseudoR2.D.soil <- glmR2(GLM.D.soil)
 
 # Variant D, dwarf shrubs
 GLM.D.shrubs <- glm(frequency ~ year, family = poisson, data = freq.D.shrubs)
-coef.D.shrubs <- coef(GLM.D.shrubs)
 pseudoR2.D.shrubs <- glmR2(GLM.D.shrubs)
 
 # Variant D, herbs 
 GLM.D.herbs <- glm(frequency ~ year, family = poisson, data = freq.D.herbs)
-coef.D.herbs <- coef(GLM.D.herbs)
 pseudoR2.D.herbs <- glmR2(GLM.D.herbs)
 
 
@@ -247,10 +250,17 @@ if (!is.null(viewer)){
 # Plotting ----
 
 # It makes more sense to put variant D to variant A, for an easier comparision...
-
 par(mfrow=c(2,2))
-plotGLM(freq.A.soil, freq.A.shrubs, freq.A.herbs, coef.A.soil, coef.A.shrubs, coef.A.herbs, c(2008,2009,2010,2011), 'Null variant (A)')
-plotGLM(freq.D.soil, freq.D.shrubs, freq.D.herbs, coef.D.soil, coef.D.shrubs, coef.D.herbs, c(2008,2009,2010,2011), 'Browsing (D)')
-plotGLM(freq.B.soil, freq.B.shrubs, freq.B.herbs, coef.B.soil, coef.B.shrubs, coef.B.herbs, c(2008,2009,2010,2011), 'Mown, targeted pasturing (B)')
-plotGLM(freq.C.soil, freq.C.shrubs, freq.C.herbs, coef.C.soil, coef.C.shrubs, coef.C.herbs, c(2008,2009,2010,2011), 'Targeted pasturing (C)')
-
+plotGLM(GLM.A.soil, GLM.A.shrubs, GLM.A.herbs, c(2008,2009,2010,2011), 'Null variant (A)')
+ci.lines(GLM.A.shrubs, seq(0,3,1), 'lightgreen')
+ci.lines(GLM.A.herbs, seq(0,3,1), 'dodgerblue')
+plotGLM(GLM.D.soil, GLM.D.shrubs, GLM.D.herbs, c(2008,2009,2010,2011), 'Browsing (D)')
+# Variant D was startet a year later!
+ci.lines(GLM.D.shrubs, seq(1,3,1), 'lightgreen')
+ci.lines(GLM.D.herbs, seq(1,3,1), 'dodgerblue')
+plotGLM(GLM.B.soil, GLM.B.shrubs, GLM.B.herbs, c(2008,2009,2010,2011), 'Mown, targeted pasturing (B)')
+ci.lines(GLM.B.shrubs, seq(0,3,1), 'lightgreen')
+ci.lines(GLM.B.herbs, seq(0,3,1), 'dodgerblue')
+plotGLM(GLM.C.soil, GLM.C.shrubs, GLM.C.herbs, c(2008,2009,2010,2011), 'Targeted pasturing (C)')
+ci.lines(GLM.C.shrubs, seq(0,3,1), 'lightgreen')
+ci.lines(GLM.C.herbs, seq(0,3,1), 'dodgerblue')
