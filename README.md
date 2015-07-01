@@ -48,6 +48,12 @@ frequency: cover of the functional types, measured with a quadrat
 
 **Columns:**
 ```
-id: Id for the assessment: Coded with the Variant (A,B,C,D - see above), the replicate (1-4) and the year (08 - 11): For example ID A108 stands vor variant A (Null variant), replicate 1, in 2008 (08)
-DwarfShrubs, Herbs, Lichens, Mosses, Opensoil: Proportion of cover, also estimated with a 1m²-quadrat
+id: Id for the assessment:
+	Coded with 
+		the Variant (A,B,C,D - see above),
+		the replicate (1-4) and 
+		the year (08 - 11)
+	For example ID A108 stands vor variant A (Null variant), replicate 1, in 2008 (08)
+DwarfShrubs, Herbs, Lichens, Mosses, Opensoil: 
+	Proportion of cover of the respective functional group, also estimated with a 1m²-quadrat
 ```
