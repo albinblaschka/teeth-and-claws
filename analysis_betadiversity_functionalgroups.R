@@ -41,6 +41,4 @@ plot(mod.HSD)
 
 syms <- c(rep(1:4, each = 16))
 modplot <- plot(mod, axes = c(1,2), main='')
-#ordipointlabel(mod, display="sites", add=TRUE)
-#identify(modplot, 'sites', cex=0.7)
 

@@ -24,12 +24,12 @@ Here on GitHub the original data and accompanying R-Scripts are available.
 
 To study the changes in vegetation and restoration of pastures already infested with shrubs by targeted pasturing, a trial
 following a factorial design was set up, with four replicates. The development of three functional groups (dwarf shrubs,
-herbs and open soil) is analysed with a GLM, for details see the comments in the script.
+herbs and open soil) was estimated with a 1m²-quadrat every year and is analysed with a GLM, for details see the comments in the script.
 
 **Columns:**
 ```
 variant: Factor, 4 levels "A","B","C","D"
-      A: Null variant, no impact
+      A: Null variant, no treatment
       B: First mown, followed by targeted pasturing
       C: Only targeted pasturing
       D: Extensive pasturing, browsing
@@ -39,4 +39,15 @@ replicate: int - four replicates were used for all variants
 functionaltype: Factor, 3 levels - "open soil","dwarf shrubs", "herbs"
 frequency: cover of the functional types, measured with a quadrat
            (1m², divided by 10cm by 10cm): Dependent variable
+```
+
+#### Analysis of betadiversity - Development of plot
+- Script: [analysis_betadiversity_functionalgroups.R](https://github.com/albinblaschka/teeth-and-claws/blob/master/analysis_betadiversity_functionalgroups.R)
+- Data: [data_betadiversity.csv](https://github.com/albinblaschka/teeth-and-claws/blob/master/data_betadiversity.csv)
+- Data format: data_betadiversity.csvt
+
+**Columns:**
+```
+id: Id for the assessment: Coded with the Variant (A,B,C,D - see above), the replicate (1-4) and the year (08 - 11): For example ID A108 stands vor variant A (Null variant), replicate 1, in 2008 (08)
+DwarfShrubs, Herbs, Lichens, Mosses, Opensoil: Proportion of cover, also estimated with a 1m²-quadrat
 ```
