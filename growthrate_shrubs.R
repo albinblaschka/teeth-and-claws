@@ -1,78 +1,98 @@
 
-library(RPostgreSQL)
+
+# Head ----
+
+## Title: Analysis of development of functional groups
+## Author: Albin Blaschka - albin.blaschka@standortsanalyse.net
+
+## This script is part of the analysis done for my doctoral thesis. For a full description see (in german):
+## Blaschka, A., 2015. Mit Zähnen und Klauen: Erhalt und Wiederherstellung von Ökosystemleistungen
+## einer alpinen Kulturlandschaft. Doctoral Thesis, Paris Lodron Universität Salzburg.
+## doi:10.13140/RG.2.1.3582.6724
+
+## Data file: data_functionalgroups_development.csv: 178 observations of 5 variables
+## Definition of columns is also available via a *.csvt - file: see http://www.gdal.org/drv_csv.html for explanation
+
+## Columns:
+## variant: Factor, 4 levels "A","B","C","D"
+##      A: Null variant, no impact
+##      B: First mown, followed by targeted pasturing
+##      C: Only targeted pasturing
+##      D: Extensive pasturing, browsing
+## year: int - denotes the duration of the trial (4 years); variant D was started one year later as the other variants (3 years)
+## replicate: int - four replicates were used for all variants
+## functionaltype: Factor, 3 levels - "open soil","dwarf shrubs", "herbs"
+## frequency: cover of the functional types, measured with a quadrat (1m², divided by 10cm by 10cm): Dependent variable
+
+# Initialization of variables, check if needed packages are available, installing, loading  -----
+
 library(xtable)
 
-setwd("~/Projekte/Diss/Skriptorium/gfx")
-m <- dbDriver("PostgreSQL")
-con <- dbConnect(m, user="postgres", password="lisanto", dbname="agram", host="127.0.0.1")
-frequenzen <- dbGetQuery(con,
-      "SELECT
-          frequenz_klassen.flaeche,
-      	  frequenz_klassen.variante,
-      	  frequenz_klassen.a_jahr as jahr,
-      	  frequenz_klassen.wh,
-      	  frequenz_klassen.deckungsklasse,
-      	  count(frequenz_klassen.deckungsklasse) AS frequenz
+# Reading data file ----
 
-      FROM vegetation.frequenz_klassen
+funcGroupsData <- read.csv('data_functionalgroups_development.csv')
 
-      WHERE frequenz_klassen.deckungsklasse in (1,4,5)           
+# Assigning factors for funtional groups ----
+# 1 ... open soil
+# 4 ... dwarf shrubs
+# 5 ... herbs
+# Remark: The missing groups (2 and 3 -> mosses and lichens) are not considered here because of low abundance
 
-      GROUP BY
-          frequenz_klassen.flaeche,
-          frequenz_klassen.variante,
-      	  frequenz_klassen.a_jahr,
-      	  frequenz_klassen.wh,
-      	  frequenz_klassen.deckungsklasse
-     
-      ORDER BY
-      	  a_jahr,
-      	  wh,
-          variante;")
+# Some hints for naming variables: Letters B, C, D rpresent variants, LU stands for livestock unit, cum stands for cumulative
+# and dwarfs stands for dwarf shrubs, meaning the functional groups, herbs is the same
 
-m <- dbDisconnect(con)
+funcGroupsData$functionaltype <- factor(funcGroupsData$functionaltype,labels = c('open soil','dwarf shrubs','herbs'))
 
-# 1 ... offener Boden
-# 4 ... Zwergsträucher/verholzt
-# 5 ... Gräser/Kräuter/Leguminosen
-frequenzen$deckungsklasse <- factor(frequenzen$deckungsklasse,labels = c('Boden','Zwergsträucher','Gräser/Kräuter'))
+# Variante A/0?? siehe Original - Skript...
 
-dta.ross <- subset(frequenzen, flaeche=='Rossfeldsattel')
-dta.knappl <- subset(frequenzen, flaeche=='Knappl')
+dta.BC <- subset(funcGroupsData, variant== c('B','C'))
+dta.D <- subset(funcGroupsData, variant=='D')
+BC.dwarfs <- subset(dta.BC, functionaltype == 'dwarf shrubs')
+D.dwarfs <- subset(dta.D, functionaltype == 'dwarf shrubs')
+BC.herbs <- subset(dta.BC, functionaltype == 'herbs')
+D.herbs <- subset(dta.D, functionaltype == 'herbs')
 
-gve.Ross <- c(1.1,0.3,0.53)
-gve.knappl <- c(0.15,0.17,0.20)
+## Join cumulated Livestock Units (LU) to dataframe
+LU.BC <- c(1.1,0.3,0.53)
+LU.D <- c(0.15,0.17,0.20)
+LU.cum.BC <- c(1.1,2.2,2.5,3.03)
+LU.cum.D <- c(0.15,0.32,0.52)
+x.BC <- dta.BC$year
+x.D <- dta.D$year
+level <- c(0,1,2,3)
+cumLU.BC <- LU.cum.BC[match(x.BC,level)]
+cumLU.D <- LU.cum.D[match(x.D,level)]
 
-gve.kum.ross <- c(1.1,2.2,2.5,3.03)
-#gve.kum.ross <- c(1.1,2.3,2.8,3.2) # Besatzformel
+BC.dwarfs.2008 <- subset(BC.dwarfs, year == '0')
+BC.dwarfs.2009 <- subset(BC.dwarfs, year == '1')
+BC.dwarfs.2010 <- subset(BC.dwarfs, year == '2')
+BC.dwarfs.2011 <- subset(BC.dwarfs, year == '3')
 
-gve.kum.knappl <- c(0.15,0.32,0.52)
+BC.herbs.2008 <- subset(BC.herbs, year == '0')
+BC.herbs.2009 <- subset(BC.herbs, year == '1')
+BC.herbs.2010 <- subset(BC.herbs, year == '2')
+BC.herbs.2011 <- subset(BC.herbs, year == '3')
 
-## Anfügen der kumulierten GVE/ha/a
-x.ross <- dta.ross$jahr
-x.knappl <- dta.knappl$jahr
+D.dwarfs.2009 <- subset(D.dwarfs, year == '1') # meaning 2009
+D.dwarfs.2010 <- subset(D.dwarfs, year == '2') # meaning 2010
+D.dwarfs.2011 <- subset(D.dwarfs, year == '3') # meaning 2011
 
-level <- c(2008,2009,2010,2011)
+D.herbs.2009 <- subset(D.herbs, year == '1') # meaning 2009
+D.herbs.2010 <- subset(D.herbs, year == '2') # meaning 2010
+D.herbs.2011 <- subset(D.herbs, year == '3') # meaning 2011
 
-kumgve.ross <- gve.kum.ross[match(x.ross,level)]
-kumgve.knappl <- gve.kum.knappl[match(x.knappl,level)]
+BC.dwarfs.2010 <- BC.dwarfs.2010[BC.dwarfs.2010$replicate != 1 & BC.dwarfs.2010$variant == 'B', ]
+BC.dwarfs.2010 <- BC.dwarfs.2010[BC.dwarfs.2010$replicate != 3 & BC.dwarfs.2010$variant == 'B', ]
 
-#dta.ross$jahr <- dta.ross$jahr-2008
-#dta.knappl$jahr <- dta.knappl$jahr-2009
+BC.dwarf.rate.0809 <- BC.dwarfs.2009$frequency / BC.dwarfs.2008$frequency
+BC.dwarf.rate.0910 <- BC.dwarfs.2010$frequency / BC.dwarfs.2009$frequency
+BC.dwarf.rate.1011 <- BC.dwarfs.2011$frequency / BC.dwarfs.2010$frequency
 
-ross.Z <- subset(dta.ross, deckungsklasse == 'Zwergsträucher')
-knappl.Z <- subset(dta.knappl, deckungsklasse == 'Zwergsträucher')
+BC.herbs.rate.0809 <- BC.herbs.2009$frequency / BC.herbs.2008$frequency
+BC.herbs.rate.0910 <- BC.herbs.2010$frequency / BC.herbs.2009$frequency
+BC.herbs.rate.1011 <- BC.herbs.2011$frequency / BC.herbs.2010$frequency
 
-ross.G <- subset(dta.ross, deckungsklasse == 'Gräser/Kräuter')
-knappl.G <- subset(dta.knappl, deckungsklasse == 'Gräser/Kräuter')
-
-knappl.2009 <- subset(knappl.Z, jahr == '2009')
-knappl.2010 <- subset(knappl.Z, jahr == '2010')
-knappl.2011 <- subset(knappl.Z, jahr == '2011')
-
-knappl.G2009 <- subset(knappl.G, jahr == '2009')
-knappl.G2010 <- subset(knappl.G, jahr == '2010')
-knappl.G2011 <- subset(knappl.G, jahr == '2011')
+# ------------------------------------
 
 k.0910 <- knappl.2010$frequenz / knappl.2009$frequenz 
 k.1011 <- knappl.2011$frequenz / knappl.2010$frequenz 
@@ -80,28 +100,7 @@ k.1011 <- knappl.2011$frequenz / knappl.2010$frequenz
 kG.0910 <- knappl.G2010$frequenz / knappl.G2009$frequenz 
 kG.1011 <- knappl.G2011$frequenz / knappl.G2010$frequenz 
 
-ross.2008 <- subset(ross.Z, jahr == '2008')
-ross.2009 <- subset(ross.Z, jahr == '2009')
-ross.2010 <- subset(ross.Z, jahr == '2010')
-ross.2011 <- subset(ross.Z, jahr == '2011')
 
-ross.G2008 <- subset(ross.G, jahr == '2008')
-ross.G2009 <- subset(ross.G, jahr == '2009')
-ross.G2010 <- subset(ross.G, jahr == '2010')
-ross.G2011 <- subset(ross.G, jahr == '2011')
-
-r.0809 <- ross.2009$frequenz / ross.2008$frequenz
-r.0910 <- ross.2010$frequenz / ross.2009$frequenz
-r.1011 <- ross.2011$frequenz / ross.2010$frequenz 
-
-rG.0809 <- ross.G2009$frequenz / ross.G2008$frequenz
-rG.0910 <- ross.G2010$frequenz / ross.G2009$frequenz
-rG.1011 <- ross.G2011$frequenz / ross.G2010$frequenz 
-
-ross.2010 <- ross.2010[ross.2010$wh != 1 & ross.2010$variante == 'M', ]
-ross.2010 <- ross.2010[ross.2010$wh != 3 & ross.2010$variante == 'M', ]
-
-r.1011 <- ross.2011$frequenz / ross.2010$frequenz 
 
 qrframe <- data.frame(q = r.0809, variante = ross.2009$variante, wh = ross.2009$wh, jahr=rep(2009,12), kumgve = rep(c(0,1.1,1.1),4))
 qrframe.tmp <- data.frame(q = r.0910, variante = ross.2010$variante, wh = ross.2010$wh, jahr=rep(2010,12), kumgve = rep(c(0,2.2,2.2),4))
@@ -119,7 +118,7 @@ qrframe
 
 qrframe.tmp <- NULL
 
-# Aufbau Dataframe Gräser -----
+# Compiling dataframe herbs -----
 
 qrframe.G <- data.frame(q = rG.0809, variante = ross.2009$variante, wh = ross.2009$wh, jahr=rep(2009,12), kumgve = rep(c(0,1.1,1.1),4))
 qrframe.tmp <- data.frame(q = rG.0910, variante = ross.2010$variante, wh = ross.2010$wh, jahr=rep(2010,12), kumgve = rep(c(0,2.2,2.2),4))
@@ -137,7 +136,7 @@ qrframe.G
 
 qrframe.tmp <- NULL
 
-# Modellierung Zwergsträucher -----
+# Model for dwarf shrubs -----
 
 qmod <- lm(q ~ kumgve, data=qrframe)
 summary(qmod)
@@ -146,7 +145,7 @@ fitted.Z <- predict.lm(qmod, interval = "confidence")
 coefs <- coef(qmod)
 coefs
 
-# Modellierung Gräser/Kräuter -----
+# Model for herbs -----
 
 qmod.G <- lm(q ~ kumgve, data=qrframe.G)
 summary(qmod.G)

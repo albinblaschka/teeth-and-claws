@@ -114,7 +114,7 @@ funcGroupsData <- read.csv('data_functionalgroups_development.csv')
 # 1 ... open soil
 # 4 ... dwarf shrubs
 # 5 ... herbs
-# Remark: The missing groups (2 and 3 -> mosses and lichens) are not considered because of low abundance
+# Remark: The missing groups (2 and 3 -> mosses and lichens) are not considered here because of low abundance
 
 funcGroupsData$functionaltype <- factor(funcGroupsData$functionaltype,labels = c('open soil','dwarf shrubs','herbs'))
 
