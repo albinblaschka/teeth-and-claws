@@ -16,7 +16,7 @@ library(stargazer)
 
 # Reading data file ----
 
-funcGroupsData <- read.csv('data_betadiversity.csv', as.is = TRUE)
+funcGroupsData <- read.csv('data_betadiversity_functionalgroups.csv', as.is = TRUE)
 dist <- vegdist(funcGroupsData,'euclid', na.rm = TRUE)
 
 groups <- substr(funcGroupsData[,1],1,1)
