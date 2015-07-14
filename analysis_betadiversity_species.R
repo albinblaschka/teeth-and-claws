@@ -21,6 +21,12 @@ groups <- factor(groups, labels = c("A","B","C", "D"))
 ## Calculate multivariate dispersions
 mod <- betadisper(species.dist, groups)
 mod
+
+## Get "Goodness of Fit" (GOF) for first two axes (parameter k=2):
+## Function wcmdscale, also from vegan
+x <- wcmdscale(species.dist, eig = TRUE, x.ret=TRUE, k=2)
+x$GOF
+
 ## Perform test
 t.mod <- anova(mod)
 summary(t.mod)
@@ -38,6 +44,7 @@ syms <- c(rep(1:4, each = 16))
 
 #pdf('PCoA_Arten.pdf', onefile=TRUE, width = 5, height = 5, paper = 'special', pointsize = 12, useDingbats = FALSE)
 modplot <- plot(mod, axes = c(1,2), main='')
+boxplot(mod)
 #dev.off()
 
 ordipointlabel(mod, display="sites", add=TRUE)
