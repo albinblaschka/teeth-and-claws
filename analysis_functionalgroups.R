@@ -108,7 +108,8 @@ plotGLM <- function(model.soil,model.shrubs, model.herbs, period, cap) {
 
 # Reading data file ----
 
-funcGroupsData <- read.csv('data_functionalgroups_development.csv')
+funcGroupsData <- read.csv2('https://raw.githubusercontent.com/albinblaschka/teeth-and-claws/master/data_functionalgroups_development.csv',
+							header = TRUE, sep = ',')
 
 # Assigning factors for funtional groups ----
 # 1 ... open soil
