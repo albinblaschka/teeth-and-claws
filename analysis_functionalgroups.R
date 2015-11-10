@@ -89,6 +89,17 @@ ci.lines <- function(model, predfor, lcol) {
     
 }
 
+# Test for overdispersion following
+# Zuur, A.F., Hilbe, J.M., Ieno, E.N., 2013. A Beginner’s Guide to GLM and GLMM with R. A frequentist and
+# Bayesian perspective for ecologists. Highland Statistics Ltd., Newburgh, United Kingdom, Page 21-22
+
+dispersion <- function(glmSum){
+	Res <- resid(glmSum, type='pearson')
+	N <- nrow(glmSum$data)
+	p <- length(coef(glmSum))
+	Dis <- sum(Res^2) / (N - p)
+}
+
 
 # Plotting the Model
 plotGLM <- function(model.soil,model.shrubs, model.herbs, period, cap) {
@@ -153,57 +164,87 @@ freq.D.herbs <- subset(freq.D, functionaltype == 'herbs')
 # Variant A, open soil
 GLM.A.soil <- glm(frequency ~ year, family = poisson, data = freq.A.soil)
 pseudoR2.A.soil <- glmR2(GLM.A.soil)
+# Overdispersion
+Dispersion.A.soil <- dispersion(GLM.A.soil)
 
 # Variant A, dwarf shrubs
 GLM.A.shrubs <- glm(frequency ~ year, family = poisson, data = freq.A.shrubs)
 pseudoR2.A.shrubs <- glmR2(GLM.A.shrubs)
+# Overdispersion
+Dispersion.A.shrubs <- dispersion(GLM.A.shrubs)
 
 # Variant A, herbs 
 GLM.A.herbs <- glm(frequency ~ year, family = poisson, data = freq.A.herbs)
 pseudoR2.A.herbs <- glmR2(GLM.A.herbs)
+# Overdispersion
+Dispersion.A.herbs <- dispersion(GLM.A.herbs)
 
 # Variant B, Mown, targeted pasturing ----
 # Variant B, open soil
 GLM.B.soil <- glm(frequency ~ year, family = poisson, data = freq.B.soil)
 pseudoR2.B.soil <- glmR2(GLM.B.soil)
+# Overdispersion
+Dispersion.B.soil <- dispersion(GLM.B.soil)
 
 # Variant B, dwarf shrubs
 GLM.B.shrubs <- glm(frequency ~ year, family = poisson, data = freq.B.shrubs)
 pseudoR2.B.shrubs <- glmR2(GLM.B.shrubs)
+# Overdispersion
+Dispersion.B.shrubs <- dispersion(GLM.B.shrubs)
 
 # Variant B, herbs 
 GLM.B.herbs <- glm(frequency ~ year, family = poisson, data = freq.B.herbs)
 pseudoR2.B.herbs <- glmR2(GLM.B.herbs)
+# Overdispersion
+Dispersion.B.herbs <- dispersion(GLM.B.herbs)
 
 # Variant C, targeted pasturing ----
 # Variant C, open soil
 GLM.C.soil <- glm(frequency ~ year, family = poisson, data = freq.C.soil)
 pseudoR2.C.soil <- glmR2(GLM.C.soil)
+# Overdispersion
+Dispersion.C.soil <- dispersion(GLM.C.soil)
 
 # Variant C, dwarf shrubs
 GLM.C.shrubs <- glm(frequency ~ year, family = poisson, data = freq.C.shrubs)
 pseudoR2.C.shrubs <- glmR2(GLM.C.shrubs)
+# Overdispersion
+Dispersion.C.shrubs <- dispersion(GLM.C.shrubs)
 
 # Variant C, herbs 
 GLM.C.herbs <- glm(frequency ~ year, family = poisson, data = freq.C.herbs)
 pseudoR2.C.herbs <- glmR2(GLM.C.herbs)
+# Overdispersion
+Dispersion.C.herbs <- dispersion(GLM.C.herbs)
 
 # Variant D, browsing, extensive pasturing ----
 # Variant D, open soil
 GLM.D.soil <- glm(frequency ~ year, family = poisson, data = freq.D.soil)
 pseudoR2.D.soil <- glmR2(GLM.D.soil)
+# Overdispersion
+Dispersion.D.soil <- dispersion(GLM.D.soil)
 
 # Variant D, dwarf shrubs
 GLM.D.shrubs <- glm(frequency ~ year, family = poisson, data = freq.D.shrubs)
 pseudoR2.D.shrubs <- glmR2(GLM.D.shrubs)
+# Overdispersion
+Dispersion.D.shrubs <- dispersion(GLM.D.shrubs)
 
 # Variant D, herbs 
 GLM.D.herbs <- glm(frequency ~ year, family = poisson, data = freq.D.herbs)
 pseudoR2.D.herbs <- glmR2(GLM.D.herbs)
+# Overdispersion
+Dispersion.D.herbs <- dispersion(GLM.D.herbs)
 
 
-# Output of GLM table ----
+# Output of GLM table, Dispersion ----
 # if in R-Studio as HTML in the viewer pane, otherwise as formatted text on the console
+
+dispersion.dta <- data.frame(rbind(c(Dispersion.A.soil,Dispersion.B.soil,Dispersion.C.soil,Dispersion.D.soil),
+								  c(Dispersion.A.shrubs,Dispersion.B.shrubs,Dispersion.C.shrubs,Dispersion.D.shrubs),
+								  c(Dispersion.A.herbs,Dispersion.B.herbs,Dispersion.C.herbs,Dispersion.D.herbs)))
+rownames(dispersion.dta) <- c('Open Soil','Dwarf Shrubs','Herbs')
+names(dispersion.dta) <- c('Variant A','Variant B','Variant C','Variant D')
 
 r2.A <- list(c('Pseudo R<sup>2</sup>',pseudoR2.A.soil,pseudoR2.A.shrubs,pseudoR2.A.herbs))
 r2.B <- list(c('Pseudo R<sup>2</sup>',pseudoR2.B.soil,pseudoR2.B.shrubs,pseudoR2.B.herbs))
@@ -215,10 +256,12 @@ if (!is.null(viewer)){
     filename.B <- 'GLM.B.html'
     filename.C <- 'GLM.C.html'
     filename.D <- 'GLM.D.html'
+    filename.dis <- 'Overdispersion.html'
     htmlFile.A <- file.path(tempDir, filename.A)
     htmlFile.B <- file.path(tempDir, filename.B)
     htmlFile.C <- file.path(tempDir, filename.C)
     htmlFile.D <- file.path(tempDir, filename.D)
+    htmlFile.dis <- file.path(tempDir, filename.dis)
     
     stargazer(GLM.A.soil, GLM.A.shrubs, GLM.A.herbs, type="html", title = 'Development of cover, variant A (GLM)',
                         add.lines = r2.A, column.labels = c('Open Soil','Dwarf Shrubs','Herbs'), omit.stat = c('aic'),
@@ -232,10 +275,13 @@ if (!is.null(viewer)){
     stargazer(GLM.D.soil, GLM.D.shrubs, GLM.D.herbs, type="html", title = 'Development of cover, variant D (GLM)',
                         add.lines = r2.D, column.labels = c('Open Soil','Dwarf Shrubs','Herbs'), omit.stat = c('aic'),
                         out = htmlFile.D)
+    stargazer(dispersion.dta, type="html", summary = FALSE, title = 'Overdispersion', out = htmlFile.dis)
+    
     viewer(htmlFile.A)
     viewer(htmlFile.B)
     viewer(htmlFile.C)
     viewer(htmlFile.D)
+    viewer(htmlFile.dis)
 }else{
     stargazer(GLM.A.soil, GLM.A.shrubs, GLM.A.herbs, type="text", title = 'Development of cover, variant A (GLM)',
                         add.lines = r2.A, column.labels = c('Open Soil','Dwarf Shrubs','Herbs'), omit.stat = c('aic'))
@@ -245,6 +291,7 @@ if (!is.null(viewer)){
                         add.lines = r2.C, column.labels = c('Open Soil','Dwarf Shrubs','Herbs'), omit.stat = c('aic'))
     stargazer(GLM.D.soil, GLM.D.shrubs, GLM.D.herbs, type="text", title = 'Development of cover, variant D (GLM)',
                         add.lines = r2.D, column.labels = c('Open Soil','Dwarf Shrubs','Herbs'), omit.stat = c('aic'))
+    stargazer(dispersion.dta, type="text", summary = FALSE, title = 'Overdispersion')
 }
 
 
