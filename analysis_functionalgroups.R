@@ -12,6 +12,10 @@
 ## To study the changes in vegetation and restoration of pastures already infested with shrubs by targeted
 ## pasturing, a trial following a factorial design was set up, with four replicates. The development of
 ## three functional groups (dwarf shrubs, herbs and open soil) is analysed with a GLM.
+## In the thesis, I originally used a Poisson distribution for the GLM, as it deals with count data, the
+## assessments were done with a quadrat with 1m2. During a review for a paper presenting this data and analysis
+## the objection was made that overdispersion was ignored. To consider this, I use a Quasi-Poisson distribution
+## which does not change the final outcome and conclusions.
 
 ## The script takes advantage of features of the IDE R-Studio (http://www.rstudio.com/products/RStudio),
 ## namely of the different panes, but is fully functional on the plain vanilla R-Console
@@ -162,76 +166,76 @@ freq.D.herbs <- subset(freq.D, functionaltype == 'herbs')
 
 # Variant A, Null ----
 # Variant A, open soil
-GLM.A.soil <- glm(frequency ~ year, family = poisson, data = freq.A.soil)
+GLM.A.soil <- glm(frequency ~ year, family = quasipoisson, data = freq.A.soil)
 pseudoR2.A.soil <- glmR2(GLM.A.soil)
 # Overdispersion
 Dispersion.A.soil <- dispersion(GLM.A.soil)
 
 # Variant A, dwarf shrubs
-GLM.A.shrubs <- glm(frequency ~ year, family = poisson, data = freq.A.shrubs)
+GLM.A.shrubs <- glm(frequency ~ year, family = quasipoisson, data = freq.A.shrubs)
 pseudoR2.A.shrubs <- glmR2(GLM.A.shrubs)
 # Overdispersion
 Dispersion.A.shrubs <- dispersion(GLM.A.shrubs)
 
 # Variant A, herbs 
-GLM.A.herbs <- glm(frequency ~ year, family = poisson, data = freq.A.herbs)
+GLM.A.herbs <- glm(frequency ~ year, family = quasipoisson, data = freq.A.herbs)
 pseudoR2.A.herbs <- glmR2(GLM.A.herbs)
 # Overdispersion
 Dispersion.A.herbs <- dispersion(GLM.A.herbs)
 
 # Variant B, Mown, targeted pasturing ----
 # Variant B, open soil
-GLM.B.soil <- glm(frequency ~ year, family = poisson, data = freq.B.soil)
+GLM.B.soil <- glm(frequency ~ year, family = quasipoisson, data = freq.B.soil)
 pseudoR2.B.soil <- glmR2(GLM.B.soil)
 # Overdispersion
 Dispersion.B.soil <- dispersion(GLM.B.soil)
 
 # Variant B, dwarf shrubs
-GLM.B.shrubs <- glm(frequency ~ year, family = poisson, data = freq.B.shrubs)
+GLM.B.shrubs <- glm(frequency ~ year, family = quasipoisson, data = freq.B.shrubs)
 pseudoR2.B.shrubs <- glmR2(GLM.B.shrubs)
 # Overdispersion
 Dispersion.B.shrubs <- dispersion(GLM.B.shrubs)
 
 # Variant B, herbs 
-GLM.B.herbs <- glm(frequency ~ year, family = poisson, data = freq.B.herbs)
+GLM.B.herbs <- glm(frequency ~ year, family = quasipoisson, data = freq.B.herbs)
 pseudoR2.B.herbs <- glmR2(GLM.B.herbs)
 # Overdispersion
 Dispersion.B.herbs <- dispersion(GLM.B.herbs)
 
 # Variant C, targeted pasturing ----
 # Variant C, open soil
-GLM.C.soil <- glm(frequency ~ year, family = poisson, data = freq.C.soil)
+GLM.C.soil <- glm(frequency ~ year, family = quasipoisson, data = freq.C.soil)
 pseudoR2.C.soil <- glmR2(GLM.C.soil)
 # Overdispersion
 Dispersion.C.soil <- dispersion(GLM.C.soil)
 
 # Variant C, dwarf shrubs
-GLM.C.shrubs <- glm(frequency ~ year, family = poisson, data = freq.C.shrubs)
+GLM.C.shrubs <- glm(frequency ~ year, family = quasipoisson, data = freq.C.shrubs)
 pseudoR2.C.shrubs <- glmR2(GLM.C.shrubs)
 # Overdispersion
 Dispersion.C.shrubs <- dispersion(GLM.C.shrubs)
 
 # Variant C, herbs 
-GLM.C.herbs <- glm(frequency ~ year, family = poisson, data = freq.C.herbs)
+GLM.C.herbs <- glm(frequency ~ year, family = quasipoisson, data = freq.C.herbs)
 pseudoR2.C.herbs <- glmR2(GLM.C.herbs)
 # Overdispersion
 Dispersion.C.herbs <- dispersion(GLM.C.herbs)
 
 # Variant D, browsing, extensive pasturing ----
 # Variant D, open soil
-GLM.D.soil <- glm(frequency ~ year, family = poisson, data = freq.D.soil)
+GLM.D.soil <- glm(frequency ~ year, family = quasipoisson, data = freq.D.soil)
 pseudoR2.D.soil <- glmR2(GLM.D.soil)
 # Overdispersion
 Dispersion.D.soil <- dispersion(GLM.D.soil)
 
 # Variant D, dwarf shrubs
-GLM.D.shrubs <- glm(frequency ~ year, family = poisson, data = freq.D.shrubs)
+GLM.D.shrubs <- glm(frequency ~ year, family = quasipoisson, data = freq.D.shrubs)
 pseudoR2.D.shrubs <- glmR2(GLM.D.shrubs)
 # Overdispersion
 Dispersion.D.shrubs <- dispersion(GLM.D.shrubs)
 
 # Variant D, herbs 
-GLM.D.herbs <- glm(frequency ~ year, family = poisson, data = freq.D.herbs)
+GLM.D.herbs <- glm(frequency ~ year, family = quasipoisson, data = freq.D.herbs)
 pseudoR2.D.herbs <- glmR2(GLM.D.herbs)
 # Overdispersion
 Dispersion.D.herbs <- dispersion(GLM.D.herbs)
