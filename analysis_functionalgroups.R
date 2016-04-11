@@ -16,6 +16,8 @@
 ## assessments were done with a quadrat with 1m2. During a review for a paper presenting this data and analysis
 ## the objection was made that overdispersion was ignored. To consider this, I use a Quasi-Poisson distribution
 ## which does not change the final outcome and conclusions.
+## Another reviewer critisized self-replication within the trial, as the replicates are close to each other.
+## This point is not yet taken into account.
 
 ## The script takes advantage of features of the IDE R-Studio (http://www.rstudio.com/products/RStudio),
 ## namely of the different panes, but is fully functional on the plain vanilla R-Console
@@ -44,7 +46,7 @@
 # Initialization of variables, check if needed packages are available, installing, loading  -----
 
 # Are we using R-Studio? If yes, we can use the output pane for nice formatted output and easy export
-viewer <- getOption("viewer")    
+viewer <- getOption("viewer")
 
 # A place for tempory data
 tempDir <- tempfile()
@@ -80,17 +82,17 @@ glmR2 <- function(glmSum) {
 }
 
 ci.lines <- function(model, predfor, lcol) {
-    
+
     zhat <- predict(model, se.fit = TRUE)       # result on logit or log scale
     zupper <- zhat$fit + 1.96 * zhat$se.fit
     zlower <- zhat$fit - 1.96 * zhat$se.fit
-    
+
     yupper <- unique(exp(zupper))                   # for log link
     ylower <- unique(exp(zlower))
-    
+
     lines(predfor[order(predfor)], yupper[order(predfor)], lty = 2, col = lcol)
     lines(predfor[order(predfor)], ylower[order(predfor)], lty = 2, col = lcol)
-    
+
 }
 
 # Test for overdispersion following
@@ -110,7 +112,7 @@ plotGLM <- function(model.soil,model.shrubs, model.herbs, period, cap) {
     plot(frequency ~ year, as.data.frame(model.soil$model), pch=20, col = 'brown', xlab = "Year",
          ylab = "Frequency [%]", ylim = c(0,100), main="", sub = cap,
          xaxt="n",yaxt="n")
-    points(frequency ~ year, as.data.frame(model.shrubs$model), pch=18, col = 'darkgreen') 
+    points(frequency ~ year, as.data.frame(model.shrubs$model), pch=18, col = 'darkgreen')
     points(frequency ~ year, as.data.frame(model.herbs$model), pch=17, col = 'blue')
     endpos <- length(period)-1
     axis(1, at=0:endpos, labels=period)
@@ -177,7 +179,7 @@ pseudoR2.A.shrubs <- glmR2(GLM.A.shrubs)
 # Overdispersion
 Dispersion.A.shrubs <- dispersion(GLM.A.shrubs)
 
-# Variant A, herbs 
+# Variant A, herbs
 GLM.A.herbs <- glm(frequency ~ year, family = quasipoisson, data = freq.A.herbs)
 pseudoR2.A.herbs <- glmR2(GLM.A.herbs)
 # Overdispersion
@@ -196,7 +198,7 @@ pseudoR2.B.shrubs <- glmR2(GLM.B.shrubs)
 # Overdispersion
 Dispersion.B.shrubs <- dispersion(GLM.B.shrubs)
 
-# Variant B, herbs 
+# Variant B, herbs
 GLM.B.herbs <- glm(frequency ~ year, family = quasipoisson, data = freq.B.herbs)
 pseudoR2.B.herbs <- glmR2(GLM.B.herbs)
 # Overdispersion
@@ -215,7 +217,7 @@ pseudoR2.C.shrubs <- glmR2(GLM.C.shrubs)
 # Overdispersion
 Dispersion.C.shrubs <- dispersion(GLM.C.shrubs)
 
-# Variant C, herbs 
+# Variant C, herbs
 GLM.C.herbs <- glm(frequency ~ year, family = quasipoisson, data = freq.C.herbs)
 pseudoR2.C.herbs <- glmR2(GLM.C.herbs)
 # Overdispersion
@@ -234,7 +236,7 @@ pseudoR2.D.shrubs <- glmR2(GLM.D.shrubs)
 # Overdispersion
 Dispersion.D.shrubs <- dispersion(GLM.D.shrubs)
 
-# Variant D, herbs 
+# Variant D, herbs
 GLM.D.herbs <- glm(frequency ~ year, family = quasipoisson, data = freq.D.herbs)
 pseudoR2.D.herbs <- glmR2(GLM.D.herbs)
 # Overdispersion
@@ -266,7 +268,7 @@ if (!is.null(viewer)){
     htmlFile.C <- file.path(tempDir, filename.C)
     htmlFile.D <- file.path(tempDir, filename.D)
     htmlFile.dis <- file.path(tempDir, filename.dis)
-    
+
     stargazer(GLM.A.soil, GLM.A.shrubs, GLM.A.herbs, type="html", title = 'Development of cover, variant A (GLM)',
                         add.lines = r2.A, column.labels = c('Open Soil','Dwarf Shrubs','Herbs'), omit.stat = c('aic'),
                         out = htmlFile.A)
@@ -280,7 +282,7 @@ if (!is.null(viewer)){
                         add.lines = r2.D, column.labels = c('Open Soil','Dwarf Shrubs','Herbs'), omit.stat = c('aic'),
                         out = htmlFile.D)
     stargazer(dispersion.dta, type="html", summary = FALSE, title = 'Overdispersion', out = htmlFile.dis)
-    
+
     viewer(htmlFile.A)
     viewer(htmlFile.B)
     viewer(htmlFile.C)
